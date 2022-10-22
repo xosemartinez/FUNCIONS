@@ -1,5 +1,25 @@
 taboa.intervalos=function(X,B,nome){
   
+  library(tables)
+  library(pander)
+  datos1=cut(X,breaks = B)
+  datos=data.frame(datos1)
+  ola= tabular( (datos1+1 ) ~1  , data=datos )
+  x=rowLabels(ola)
+  x=gsub("\\(","",x)
+  x=gsub("\\]","",x)
+  rowLabels(ola)=x
+  
+  colLabels(ola)[length(colLabels(ola))]="$n_i$"
+  rowLabels(ola)[length(rowLabels(ola))]=" "
+  dimnames(rowLabels(ola))[[2]]="$L_{i-1} - L_i$"
+  # pander(ola)
+  ola
+}
+
+
+taboa.intervalosvello=function(X,B,nome){
+  
   library(knitr)
   library(kableExtra)
   
@@ -9,6 +29,9 @@ taboa.intervalos=function(X,B,nome){
   n=as.vector(auxi)
   n[length(n)+1]=sum(n)
   
+  # engadido cando fixen presentacions de EstI en quarto
+  x=gsub("\\(","",x)
+  x=gsub("\\]","",x)
   datos=data.frame(x,n)
   names(datos)=c("$L_{i-1} - L_i$","$n_i$")
   
@@ -27,8 +50,6 @@ taboa.intervalos=function(X,B,nome){
   if (knitr::pandoc_to("docx")) {print(nome);datos}
   if (knitr::pandoc_to("odt")) {print(nome);datos}
 }
-
-
 
 taboa=function(X,nome){
 
