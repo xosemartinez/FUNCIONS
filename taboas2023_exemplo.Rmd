@@ -1,0 +1,83 @@
+Cargar ficheiro de funcions
+
+```{r}
+source("taboas2023.r")
+```
+
+Colección de funcións para elaborar táboas e incluilas en ficheiros Rmd. 
+
+Están feitas antes do último boom de paquetes para facer táboas, por que non me daba convencido ningún. Ao final traballei co paqiete `tables`, por que me permite tunear o resultado con facilidade.
+
+### taboa(X,nome)
+
+Fai unha táboa a partir dun vector numérico.
+
+- X: vector numérico
+- nome: nome para a columna de valores
+
+```{r}
+set.seed(123)
+vector=rbinom(40,4,0.7)
+texto="valores"
+ola=taboa(vector,texto)
+ola
+pander(ola)
+```
+
+
+### taboa.intervalos=function(X,B)
+
+Fai unha táboa agrupada en intervalos a partir dun vector numérico dunha variable continua.
+
+- X: vector numérico. Variable continua, ainda que non é obrigatorio
+- B: vector cos extremos do intervalo.
+
+```{r}
+set.seed(123)
+vector=rnorm(40,4,0.7)
+texto="valores"
+cortes=seq(25,55,5)/10
+ola=taboa.intervalos(vector,cortes)
+ola
+pander(ola)
+```
+
+### taboa_frecuencias=function(X,nomes)
+
+Fai unha táboa con diferentes columnas de frecuencias.
+
+- X: táboa con formato de data.frame. Ou sexa, a 1ª columna valores e os demais frecuencias
+- nomes: vector cos nomes de columnas, definitivos, preparados para latex
+
+Un exemplo, coas catro frecuencias
+
+```{r}
+set.seed(321)
+tba=as.data.frame(table(rbinom(60,4,0.4)))# creacion da taboa orixinal
+tba$Freq2=tba$Freq/sum(tba$Freq)#engadir frecuencias relativas
+tba$Freq3=cumsum(tba$Freq)#frecuencias acumuladas
+tba$Freq4=cumsum(tba$Freq2)#frecuencias acumuladas relativas
+pander(taboa_frecuencias(tba,c("Valores","$n_i$","$f_i$","$N_i$","$F_i$")))
+```
+
+Un exemplo con cualitativa nominal, e polo tanto dúas frecuencias
+
+```{r}
+set.seed(234)
+sitios=round(runif(20,2,5))
+casos=length(unique(sitios))
+sitios=factor(sitios,labels = c("Noia","Muros","Cee","Boiro","Outes","Dumbría")[1:casos])
+sitios=as.character(sitios)
+tba=as.data.frame(table(sitios))
+tba$Freq2=tba$Freq/sum(tba$Freq)
+pander(taboa_frecuencias(tba,c("Valores","$n_i$","$f_i$")))
+```
+
+Un exemplo creando directamente a taboa/data.frame, e metendo intervalos
+
+```{r}
+valores=c("0-20","20-40","40-60","60-80","80-100")
+frecuencias=c(46,1,2,0,1)
+tba=data.frame(valores,frecuencias)
+pander(taboa_frecuencias(tba,c("$L_{i-1}-L_{i}$","$n_i$")))
+```
